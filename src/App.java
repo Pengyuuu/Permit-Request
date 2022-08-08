@@ -14,7 +14,7 @@ public class App {
 
         input = requestManager.CheckRestricted(input);
 
-        //input = requestManager.NumStart(input);
+        input = requestManager.NumStart(input);
 
         output = requestManager.Group(input);
 

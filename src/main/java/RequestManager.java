@@ -72,6 +72,16 @@ public class RequestManager {
     public ArrayList<Request> NumStart(ArrayList<Request> output) {
 
         // If student did not correctly put the name of the class, just remove and add it to the sorted list
+        for (int i = output.size() - 1; i >= 0; i--) {
+
+            if (!IsAlpha(output.get(i).getSelectedClass().charAt(0))) {
+
+                sortedList.add(output.get(i));
+
+                output.remove(output.get(i));
+            }
+        }
+        /** 
         for (Request line : output) {
 
             System.out.println(!IsAlpha(line.getSelectedClass().charAt(0)));
@@ -83,6 +93,7 @@ public class RequestManager {
                 output.remove(line);
             }
         }
+        */
 
         return output;
     }
