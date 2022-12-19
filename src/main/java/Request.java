@@ -52,14 +52,13 @@ public class Request {
     }
 
     
-    public String getSelectedClass() {
+    public String getSelectedClass() { return _class; }
 
-        return _class;
-    }
+    public String getClassNum() { return _classNum; }
 
-    public void setNote(String message) {
-        _note = message;
-    }
+    public String getMessage() { return _note; }
+
+    public void setNote(String message) { _note = message; }
 
     @Override
     public String toString() {

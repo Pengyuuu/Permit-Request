@@ -1,6 +1,7 @@
 package main.java;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RequestManager {
     
@@ -12,11 +13,21 @@ public class RequestManager {
 
     private ArrayList<Request> sortedList;
 
+    private HashMap<String, String> contacts;
+
+    private HashMap<String, String> reserved;
+
     public RequestManager() {
 
         _dao = RequestDAO.getInstance();
 
         sortedList = new ArrayList<Request>();
+
+        contacts = _dao.ReadContacts();
+
+        restricted = _dao.ReadRestricted();
+
+        reserved = _dao.ReadReserved();
     }
 
     public static RequestManager GetInstance() {
@@ -34,7 +45,7 @@ public class RequestManager {
 
     public ArrayList<Request> CheckRestricted(ArrayList<Request> output) {
 
-        restricted = _dao.ReadRestricted();
+        //restricted = _dao.ReadRestricted();
 
         for (Request line : output) {
 
@@ -51,6 +62,24 @@ public class RequestManager {
     }
 
     public static boolean IsAlpha(char letter) { return letter >= 'A' && letter <= 'Z'; }
+
+    /**
+     * Finds the index of when the class numbering starts
+     * @param word  Class title to be checked
+     * @return      Index of when the 3 digit number starts
+     */
+    public static int IsNum(String word) { 
+        
+        for (int i = 0; i < word.length(); i++) {
+
+            if (Character.isDigit(word.charAt(i))) {
+
+                return i;
+            }
+        }
+
+        return 0;
+    }
 
     public static int IndexAt(String word) {
 
@@ -70,10 +99,10 @@ public class RequestManager {
     }
 
     public ArrayList<Request> NumStart(ArrayList<Request> output) {
-
+        
         // If student did not correctly put the name of the class, just remove and add it to the sorted list
         for (int i = output.size() - 1; i >= 0; i--) {
-
+            
             if (!IsAlpha(output.get(i).getSelectedClass().charAt(0))) {
 
                 sortedList.add(output.get(i));
@@ -81,32 +110,72 @@ public class RequestManager {
                 output.remove(output.get(i));
             }
         }
-        /** 
-        for (Request line : output) {
+        
+        for (int i = output.size() - 1; i >= 0; i--) {
 
-            System.out.println(!IsAlpha(line.getSelectedClass().charAt(0)));
+                sortedList.add(output.get(i));
 
-            if (!IsAlpha(line.getSelectedClass().charAt(0))) {
-
-                sortedList.add(line);
-
-                output.remove(line);
-            }
+                output.remove(i);
         }
-        */
 
-        return output;
+        return sortedList;
     }
 
     public ArrayList<Request> Group(ArrayList<Request> output) {
 
+        // Have to make new arraylist because sortedList.clear() clears output 
+        ArrayList<Request> sortedList = new ArrayList<>();
+
         while (output.size() != 0) {
-            
+
             sortedList.add(output.get(0));
 
             output.remove(0);
+
+            String item = sortedList.get(sortedList.size() - 1).getSelectedClass();
+
+            item = item.length() <= 5 ? item.substring(0, 1) 
+                : item.substring(0, IsNum(item));
+
+            String contact = contacts.get(item);
+
+            for (int i = output.size() - 1; i >= 0; i--) {
+
+                /* if (item.length() <= 5) { item = item.substring(0, 1); }
+
+                else { item = item.substring(0, 2); } */
+
+                // if getselectedclass size is <= 5, then substring 0 to 1
+
+                String requestItem = output.get(i).getSelectedClass();
+
+                requestItem = requestItem.length() <= 5 ? requestItem.substring(0, 1) 
+                    : requestItem.substring(0, IsNum(requestItem));
+
+                String requestContact = contacts.get(requestItem);
+
+                if (contact == requestContact) {
+
+                    sortedList.add(output.get(i));
+
+                    output.remove(i);
+                }
+            }
         }
 
         return sortedList;
+    }
+
+    public ArrayList<Request> CheckReserved(ArrayList<Request> output) {
+
+        for (Request line : output) {
+
+            if (reserved.containsKey(line.getClassNum())) {
+
+                if (!(line.getMessage().length() > 0)) { line.setNote(reserved.get(line.getClassNum())); }
+            }
+        }
+
+        return output;
     }
 }

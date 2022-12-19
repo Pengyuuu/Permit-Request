@@ -6,7 +6,14 @@ import java.util.ArrayList;
 public class App {
     public static void main(String[] args) {
 
-        ArrayList<Request> output = new ArrayList<>();
+        //One();
+
+        Four();
+    }
+
+    public static void One() {
+
+        //ArrayList<Request> output = new ArrayList<>();
 
         RequestManager requestManager = RequestManager.GetInstance();
 
@@ -14,9 +21,25 @@ public class App {
 
         input = requestManager.CheckRestricted(input);
 
-        input = requestManager.NumStart(input);
+        input = requestManager.CheckReserved(input);
 
-        output = requestManager.Group(input);
+        requestManager.Write(input);
+    }
+
+    public static void Four() {
+
+        RequestManager requestManager = RequestManager.GetInstance();
+
+        ArrayList<Request> output = requestManager.Read();
+
+        output = requestManager.CheckRestricted(output);
+
+        output = requestManager.CheckReserved(output);
+
+        output = requestManager.NumStart(output);
+        
+        output = requestManager.Group(output);
+        //System.out.println(output.size());
 
         requestManager.Write(output);
     }
